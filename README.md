@@ -16,10 +16,10 @@ Often sequences of shifted systems of the form (A-sigma M)x=b have to be solved 
 - Multishift IDR(s): multishift version of the standard IDR(s) algorithm. Does not include extraction of spectral information and re-using subspace information.
 - Multishift QMRIDR(s): multishift QMRIDR(s) version. Can use Multishift IDR(s) as inner iterative method.
 ## Which preconditioners are included in Fortran IDRS?
-The Fortran version of IDRS comes with a set of polynomial preconditioners (Chebyshev, Neumann,...), that can be used in combination with diagonal scaling. These preconditioners have been chosen because of the following reasons:
+The Fortran version of IDRS comes with different types of polynomial preconditioners (Chebyshev, Neumann,...), that can be used in combination with diagonal scaling. These preconditioners have been chosen because of the following reasons:
 - The user interface becomes quite simple: only a user defined type and a function that performs the matrix-vector multiplication need to be supplied.
 - Polynomial preconditioners have the special property that they can be applied to the multi-shift problem.
-- Polynomial preconditioners are quite suited for massively parallel computing.
+- Polynomial preconditioners are well suited for massively parallel computing.
 ## Are interfaces for standard matrix formats supplied?
 Yes, dense matrices, and sparse matrices in Compressed Row Storage (CRS) or Coordinate (COO) format can be simply converted to the matrix type that is used in IDRS by one simple subroutine call. After that the complete functionality of IDRS (solvers, preconditioners, parallelisation) is available.
 ## With what kind of examples does IDRS come?
