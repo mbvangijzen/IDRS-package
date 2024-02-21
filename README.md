@@ -21,6 +21,6 @@ The Fortran version of IDRS comes with a set of polynomial preconditioners (Cheb
 - Polynomial preconditioners have the special property that they can be applied to the multi-shift problem.
 - Polynomial preconditioners are quite suited for massively parallel computing.
 ## Are interfaces for standard matrix formats supplied?
-Yes, dense matrices, and sparse matrices in Compressed Row Storage (CRS) or Coordinate (COO) format can be simply converted to the type of matrices that is used in IDRS by one simple subroutine call. After that the complete functionality of IDRS (solvers, preconditioners, parallelisation) is available.
+Yes, dense matrices, and sparse matrices in Compressed Row Storage (CRS) or Coordinate (COO) format can be simply converted to the matrix type that is used in IDRS by one simple subroutine call. After that the complete functionality of IDRS (solvers, preconditioners, parallelisation) is available.
 ## With what kind of examples does IDRS come?
-IDRS comes with a wide range of test problems, in dense, COO, CRS format, and with examples that user defined formats. Test problems range from academic (for example random and toeplitz matrices) to test problems from applications (acoustics, pagerank, ocean circulation). They include both real and complex examples, and single linear systems, sequences of linear systems and multishift problems.
+IDRS comes with a wide range of test problems, in dense, COO, CRS format, and with examples with user defined formats. Test problems range from academic (for example random and toeplitz matrices) to test problems from applications (acoustics, pagerank, ocean circulation). They include both real and complex examples, and single linear systems, sequences of linear systems and multishift problems.
