@@ -1,6 +1,6 @@
 # IDRS
 ## What is IDRS?
-IDRS is a package for solving large and sparse nonsymmetric linear systems fo equations. The "IDR" in the names denotes Induced Dimension Reduction. The "S" stand for the iteration parameter s. This parameter determines the amount of vector operations and storage required by the method. A larger s normally increases the rate of convergence, but comes at the price of more memory usage and computations per iteration. For most problems a small value of s (for exampel 2 or 4) gives the best compromise. 
+IDRS is a package for solving large and sparse nonsymmetric linear systems of equations. The "IDR" in the names denotes Induced Dimension Reduction. The "S" stand for the iteration parameter s. This parameter determines the amount of vector operations and storage required by the method. A larger s normally increases the rate of convergence, but comes at the price of more memory usage and computations per iteration. For most problems a small value of s (for exampel 2 or 4) gives the best compromise. 
 IDR-methods are Krylov subspace methods. They use a recursion depth of s+2. This in contrast to most popular Krylov methods for solvinf nonsymmetric linear systems: BiCGSTAB and GMRES. BiCGSTAB uses three-term recursions while GMRES uses long recursions (recursion depth is equal to the iteration number plus one). 
 IDR-methods terminate using at most N+N/s iterations, with N the problem size. By comparison, BiCGSTAB terminates within 2N iterations and GMRES within N iterations.
 ## In what language is IDRS written?
