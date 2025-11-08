@@ -1,15 +1,10 @@
 #Standard gfortran, single processor. Should always work:
-#F90 = gfortran
-#FFLAGS = -O3 -fcheck=all -std=f2018 -fcoarray=single
+F90 = gfortran
+FFLAGS = -O3 -fcheck=all -std=f2018 -fcoarray=single
 
 #gfortran, with co-arrays. Make sure that the communication library is installed and linked correctly.
-F90 = caf
-FFLAGS = -O3 -fcheck=all -std=f2018 -fcoarray=lib -I/opt/homebrew/include -L/opt/homebrew/lib -lcaf_mpi 
+#F90 = caf
 #FFLAGS = -O3 -fcheck=all -std=f2018 -fcoarray=lib -L${OPENCOARRAYS_ROOT}/lib64 -lcaf_mpi
-
-#ifort compiler with single node support for co-arrays:
-#F90=ifort
-#FFLAGS = -Ofast -coarray
 
 OBJ = interface_module.o precision_module.o dense_la_module.o mmio.o user_module.o mm_module.o matrix_module.o idrs_module.o ritz_module.o pp_idrs_module.o
 SRC = ../../MODULES
