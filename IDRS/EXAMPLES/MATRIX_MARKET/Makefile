@@ -1,6 +1,6 @@
 #Standard gfortran, single processor. Should always work:
-#F90 = gfortran
-#FFLAGS = -O3 -std=f2018 -fcoarray=single
+F90 = gfortran
+FFLAGS = -O3 -std=f2018 -fcoarray=single
 
 #gfortran, with co-arrays. Make sure that the communication library is installed and linked correctly.
 #F90 = caf
