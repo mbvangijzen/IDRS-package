@@ -17,7 +17,7 @@
 !
 ! This software is distributed under the MIT License:
 ! http://www.opensource.org/licenses/mit-license.php
-! Copyright:(c) 2024 Martin van Gijzen
+! Copyright:(c) 2026 Martin van Gijzen
 !
 !
 module user_module
@@ -117,6 +117,31 @@ module user_module
       w = v
 
    end function cuser_precon
+
+
+   function complex_decomp( K, M, C, shift ) result(P)
+!
+! Stub routine for making an LU decompostion
+! 
+      type(user_matrix), intent(in)                    :: K
+      type(user_matrix), intent(in), optional          :: M
+      type(user_matrix), intent(in), optional          :: C
+      type(user_matrix)                                :: P
+      complex(kind=cp), optional                       :: shift
+
+   end function complex_decomp
+
+   function real_decomp( K, M, C, shift ) result(P)
+!  
+! Stub routine for making an LU decompostion
+!
+      type(user_matrix), intent(in)                    :: K
+      type(user_matrix), intent(in), optional          :: M
+      type(user_matrix), intent(in), optional          :: C
+      type(user_matrix)                                :: P
+      real(kind=rp), optional                          :: shift
+      
+   end function real_decomp
 
    function real_diagonal( A ) result(D)
 

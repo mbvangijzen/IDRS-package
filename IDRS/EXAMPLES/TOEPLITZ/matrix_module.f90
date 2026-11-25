@@ -18,12 +18,6 @@ module matrix_module
       module procedure rmatvec, cmatvec
    END INTERFACE
 
-! Define the preconditioner type 
-
-   type preconditioner
-      integer                        :: precon
-   end type preconditioner
-
 ! Overload / to define the preconditioner operation using the preconditioner type
 
    INTERFACE OPERATOR(/)

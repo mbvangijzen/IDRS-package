@@ -331,6 +331,30 @@ module user_module
 
    end function cuser_precon
 
+   function complex_decomp( K, M, C, shift ) result(P)
+!
+! Stub routine for making an LU decompostion
+!
+      type(user_matrix), intent(in)                    :: K
+      type(user_matrix), intent(in), optional          :: M
+      type(user_matrix), intent(in), optional          :: C
+      type(user_matrix)                                :: P
+      complex(kind=cp), optional                       :: shift
+
+   end function complex_decomp
+
+   function real_decomp( K, M, C, shift ) result(P)
+!
+! Stub routine for making an LU decompostion
+!
+      type(user_matrix), intent(in)                    :: K
+      type(user_matrix), intent(in), optional          :: M
+      type(user_matrix), intent(in), optional          :: C
+      type(user_matrix)                                :: P
+      real(kind=rp), optional                          :: shift
+
+   end function real_decomp
+
    subroutine get_subdomains( A, grid )
 ! 
 ! Determine problem size, subdomain devision and number of unknowns per processor

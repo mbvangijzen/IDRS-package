@@ -11,12 +11,13 @@ FFLAGS = -O3 -fcheck=all -std=f2018 -fcoarray=single
 #F90=ifort
 #FFLAGS = -Ofast -coarray
 
-OBJ = interface_module.o precision_module.o dense_la_module.o user_module.o matrix_module.o idrs_module.o ritz_module.o pp_idrs_module.o
+OBJ = interface_module.o precision_module.o dense_la_module.o user_module.o matrix_module.o idrs_module.o recycle_module.o idrs_driver_module.o
 SRC = ../../MODULES
-IDRS = $(SRC)/IDRS
-MATRIX = $(SRC)/PP_MATRIX
+IDRS = $(SRC)/IDRS_ALGORITHMS
+MATRIX = $(SRC)/MATRIX_OPERATIONS
 INPUT = $(SRC)/INTERFACE
-PP_IDRS = $(SRC)/PP_IDRS
+RECYCLE = $(SRC)/RECYCLE
+IDRS_DRIVER = $(SRC)/IDRS_DRIVER
 
 all:    top_opt
 
@@ -26,7 +27,7 @@ clean:
 top_opt:top_opt.o $(OBJ)
 	$(F90) $(FFLAGS) top_opt.o $(OBJ) -o top_opt
 
-precision_module.o:     $(IDRS)/precision_module.f90
+precision_module.o:	$(IDRS)/precision_module.f90
 	$(F90) $(FFLAGS) -c  $(IDRS)/precision_module.f90
 
 dense_la_module.o: $(IDRS)/dense_la_module.f90
@@ -44,11 +45,11 @@ interface_module.o:$(INPUT)/interface_module.f90
 idrs_module.o:$(IDRS)/idrs_module.f90 $(IDRS)/idrs.inc $(IDRS)/msidrs.inc $(IDRS)/qmridr.inc $(IDRS)/msqmridr.inc 
 	$(F90) $(FFLAGS) -c  $(IDRS)/idrs_module.f90
 
-ritz_module.o:	$(IDRS)/ritz_module.f90
-	$(F90) $(FFLAGS) -c  $(IDRS)/ritz_module.f90
+recycle_module.o:	$(RECYCLE)/recycle_module.f90
+	$(F90) $(FFLAGS) -c  $(RECYCLE)/recycle_module.f90
 
-pp_idrs_module.o:	$(PP_IDRS)/pp_idrs_module.f90
-	$(F90) $(FFLAGS) -c  $(PP_IDRS)/pp_idrs_module.f90
+idrs_driver_module.o:	$(IDRS_DRIVER)/idrs_driver_module.f90
+	$(F90) $(FFLAGS) -c  $(IDRS_DRIVER)/idrs_driver_module.f90
 
 top_opt.o:top_opt.f90 $(OBJ)
 	$(F90) $(FFLAGS) -c  top_opt.f90

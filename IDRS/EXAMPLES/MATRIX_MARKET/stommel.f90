@@ -19,11 +19,12 @@ program stommel
 ! Copyright:(c) 2024 Martin van Gijzen
 !
 
-   use precision_module ! Set the precisions for real and complex arithmatic
-   use user_module      ! This one has to be supplied by the user
-   use interface_module ! To read command line parameters
-   use mm_module        ! To read the matrix-market matrices
-   use pp_idrs_module   ! To solve the system
+   use precision_module        ! Set the precisions for real and complex arithmatic
+   use user_module             ! This one has to be supplied by the user
+   use interface_module        ! To read command line parameters
+   use mm_module               ! To read the matrix-market matrices
+   use idrs_driver_module      ! To solve the system
+   use preconditioner_module
 
    implicit none 
 
@@ -39,12 +40,6 @@ program stommel
    character(len=50)              :: matrix_file, rhs_file, map_file
    real(kind=rp), allocatable     :: x(:,:), b(:,:)
    integer                        :: nrows, ncols, nrhs, irhs
-
-! For preconditioner:
-   integer                        :: which_precon
-
-   logical                        :: lu
-   logical, parameter             :: default_lu = .false.
 
 ! Plotting:
    character(len=:), allocatable  :: plot
@@ -71,9 +66,6 @@ program stommel
 ! Which test problem?
    grid = get_parameter('-grid', default_grid )
 
-! Direct solution?
-   lu = get_parameter( '-lu', default_lu )
-
 ! Output message, problem description:
    if ( my_proc == 1 ) then
       write(*,*)
@@ -88,7 +80,7 @@ program stommel
    K = mm_matrix( trim(matrix_file), 'coo' )
 
 ! Read the right-hand-side matrix:
-   RHS = mm_matrix( rhs_file )
+   RHS = mm_matrix( trim(rhs_file) )
 
    nrows = K%nrows
    ncols = K%ncols
@@ -100,15 +92,12 @@ program stommel
 ! Copy the rhs-vector b from the user-defined type RHS
    b = RHS%rmat
 
-   which_precon = 1
-   if ( lu ) then
-! Shift-and-invert
-      which_precon = 2
-   end if
-   P = real_precon( which_precon, K )
+! Preconditioner
+   P = jacobi( K )
 
 ! Solve the system:
-   x = pp_idrs( K, b, P=P )
+   x = idrs_driver( K, b, P=P )
+!  x = idrs_driver( K, b )
 
 ! Make plot?
    include "ocean_plot.inc"

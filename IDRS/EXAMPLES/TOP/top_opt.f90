@@ -13,7 +13,7 @@ program top_opt
    use user_module
    use matrix_module
    use dense_la_module
-   use pp_idrs_module
+   use idrs_driver_module
 
    implicit none
 
@@ -204,7 +204,7 @@ program top_opt
 ! Determine displacements:
       D   = real_diagonal( A )
       P%D = D
-      x = pp_idrs( A, b, P = P, center = rcenter, foci = rfoci )
+      x = idrs_driver( A, b, P = P, center = rcenter, foci = rfoci )
 
 ! OBJECTIVE FUNCTION AND SENSITIVITY ANALYSIS
       c = 0.

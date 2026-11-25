@@ -18,7 +18,7 @@ program cdr
    use interface_module          ! To read command line options
    use precision_module          ! Set real and complex precision
    use user_module               ! User functions, user defined matrix-vector product
-   use pp_idrs_module            ! Preconditioner IDRS solver calls
+   use idrs_driver_module        ! Preconditioner IDRS solver calls
 
    implicit none 
 
@@ -93,12 +93,12 @@ program cdr
    rfoci(2) = 1.85_rp*A%c
 
    if ( multishift ) then
-      x_ms = pp_idrs( A, b, sigma )
+      x_ms = idrs_driver( A, b, sigma )
    else
       if ( grid > 4 ) then
-         x    = pp_idrs( A, b, foci=rfoci, center=rcenter )
+         x    = idrs_driver( A, b, foci=rfoci, center=rcenter )
       else
-         x    = pp_idrs( A, b )
+         x    = idrs_driver( A, b )
       end if
    end if
 

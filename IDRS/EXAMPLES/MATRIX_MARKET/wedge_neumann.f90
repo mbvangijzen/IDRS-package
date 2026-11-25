@@ -17,19 +17,20 @@ program wedge_neumann
 !
 ! This software is distributed under the MIT License:
 ! http://www.opensource.org/licenses/mit-license.php
-! Copyright:(c) 2025 Martin van Gijzen
+! Copyright:(c) 2026 Martin van Gijzen
 !
 !
    use interface_module
    use precision_module
    use user_module
    use mm_module
-   use pp_idrs_module
+   use idrs_driver_module
 
    implicit none 
   
-   type(user_matrix)              :: K, M, P, RHS
+   type(user_matrix)              :: K, M, RHS
    real(kind=rp), allocatable     :: x(:,:), b(:)
+   real(kind=rp), allocatable     :: lambda(:), eigfreq(:)
    real(kind=rp)                  :: pi
 
    integer                        :: nrows, ncols
@@ -48,15 +49,9 @@ program wedge_neumann
    logical                        :: multishift
    logical, parameter             :: default_multishift = .false.
 
-! For preconditioner:
-   integer                        :: which_precon
-
-   logical                        :: lu
-   logical, parameter             :: default_lu = .false.
-
-   logical                        :: deflation
-   logical, parameter             :: default_deflation = .false.
-   real(kind=rp), allocatable     :: V(:,:)
+   logical                        :: eigen
+   integer, parameter             :: default_neig = 0             ! Number of eigenvalues
+   integer                        :: neig, ieig
 
 ! Plotting:
    character(len=:), allocatable  :: plot
@@ -66,8 +61,12 @@ program wedge_neumann
    logical, parameter             :: default_gif  = .false.
    logical, parameter             :: default_jpeg = .false.
 
+! Points in each direction on coarsest grid:
+   integer, parameter             :: px =  6
+   integer, parameter             :: py = 10
+
    integer                        :: igrid, Ngrid, nb, ne, nx, ny, i, j
-   integer                        :: my_proc, num_procs
+   integer                        :: my_proc, num_procs, n_solns
 
 ! Initialization for parameter routines (read command line)
    call initialize( )
@@ -79,41 +78,26 @@ program wedge_neumann
 ! Which grid?
    grid = get_parameter( '-grid', default_grid )
 
+! Deflation?
+   neig = get_parameter( '-eigen', default_neig )
+   eigen = ( neig > 0 )
+
 ! Single frequency problem?
    multishift = get_parameter( '-multi', default_multishift )
-
-! Direct solution?
-   lu = get_parameter( '-lu', default_lu )
-
-! Deflation?
-   deflation = get_parameter( '-deflation', default_deflation )
 
 ! Output message, problem description:
    if ( my_proc == 1 ) then
       write(*,*)
       write(*,'(a)') '========================================================================='
-      if (  multishift ) then
-         if ( lu ) then
-            write(*,'(a)') 'Multiple frequency wedge problem with band Shift-and-Invert preconditioner.'
-         else
-            write(*,'(a)') 'Multiple frequency wedge problem with lumped mass matrix.'
-         end if
+      if ( neig > 0 ) then
+         write(*,'(a)') 'Eigenvalue wedge problem.'
+      elseif (  multishift ) then
+         write(*,'(a)') 'Multiple frequency wedge problem.'
       else
-         if ( lu ) then
-            write(*,'(a)') 'Single frequency wedge problem with band Shift-and-Invert preconditioner.'
-         else
-            write(*,'(a)') 'Single frequency wedge problem.'
-         end if
+         write(*,'(a)') 'Single frequency wedge problem.'
       end if
       write(*,'(a,i2,/)') 'Neumann boundary conditions. Grid is ',grid
    end if
-
-! Frequencies:
-   allocate(freq(grid))
-   freq(1) = 1._rp
-   do isigma = 2, grid
-      freq(isigma) = freq(isigma-1)*2._rp
-   end do
   
    write(stiffness_file,'(a,i1,a)') 'DATA/WEDGE_DATA/wedge', grid,'_K.mtx'
    write(mass_file,'(a,i1,a)')      'DATA/WEDGE_DATA/wedge', grid,'_M.mtx'
@@ -131,58 +115,63 @@ program wedge_neumann
 ! Problem size
    nrows = K%nrows
    ncols = K%ncols
+
+! Number of shifts:
    Nsigma = grid
 
-! Allocate solution and rhs vectors, and the shifts
-   allocate( x(nrows,Nsigma), b(nrows),sigma(Nsigma) )
+! Frequencies:
+   allocate(freq(Nsigma),sigma(Nsigma))
+   freq(1) = 1._rp
+   do isigma = 2, grid
+      freq(isigma) = freq(isigma-1)*2._rp
+   end do
 
-! Set the shifts and right-hand-side vector:
-   b = RHS%rmat(:,1)
+! Set the shifts:
    sigma = (2._rp*pi*freq)**2
 
-! Preconditioner:
-   rshift = -2._rp*sigma(1)*sigma(Nsigma)/(sigma(1)+sigma(Nsigma))
-   if ( lu ) then
-      which_precon = 3
-      P = real_precon( which_precon, K, M, shift=rshift )
-   elseif ( multishift ) then
-! Lumped mass matrix
-      which_precon = 1
-      P = real_precon( which_precon, M )
+! Eigenvalues and eigenfrequencies:
+   allocate( lambda(neig), eigfreq(neig) )
+
+! Number of solutions to be computed (neig for eigen, Nsigma for multishift
+   if ( eigen ) then
+      n_solns = neig
+   else
+      n_solns = Nsigma
    end if
 
-! Deflation:
-   if ( deflation ) then
-      allocate(V(nrows,1))
-      V = 1._rp
-      V(:,1) = M*V(:,1)
-   end if
- 
-! Solve the systems:
-   if ( .not. multishift ) then
+! Allocate solution and rhs vectors
+   allocate( x(nrows,n_solns), b(nrows) )
+   b = RHS%rmat(:,1)
+
+   if ( eigen ) then
+!
+! Eigenvalue analysis
+!
+      rshift = sigma(Nsigma)
+      call idreig_driver( lambda, x, K, b, M, shift = rshift  )
+      eigfreq = sqrt(lambda)/(2._rp*pi)
+
+   elseif ( multishift ) then
+!
+! Multiple frequency problem
+!
+
+!     rshift = -2._rp*sigma(1)*sigma(Nsigma)/(sigma(1)+sigma(Nsigma))
+      x = idrs_driver( K, b, sigma, M )
+
+   else
+!
+! Sequence of shifted problems
+!
       do isigma = 1, Nsigma
          rseed = sigma(isigma)
-         if ( deflation ) then
-            x(:,isigma) = pp_idrs( K, b, M, P=P, seed=rseed, V = V )
-         else
-            x(:,isigma) = pp_idrs( K, b, M, P=P, seed=rseed )
-         end if
+         x(:,isigma) = idrs_driver( K, b, M, seed=rseed )
       end do
-   else
-      rseed = sigma(Nsigma)
-      if ( lu .and. deflation ) then
-         x = pp_idrs( K, b, sigma, M, P=P, seed=rseed, shift=rshift, V=V )
-      elseif ( lu ) then
-         x = pp_idrs( K, b, sigma, M, P=P, seed=rseed, shift=rshift )
-      elseif ( deflation ) then
-         x = pp_idrs( K, b, sigma, M, P=P, seed=rseed, V=V )
-      else
-         x = pp_idrs( K, b, sigma, M, P=P, seed=rseed )
-      end if
+
    end if
 
 ! Plot solution?
-   include "wedge_plot.inc"
+   include "solns_plot.inc"
 
    if ( my_proc == 1 ) &
       write(*,'(a)') '========================================================================='

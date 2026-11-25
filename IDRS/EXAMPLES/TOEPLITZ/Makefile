@@ -1,6 +1,6 @@
 #Standard gfortran, single processor. Should always work:
 F90 = gfortran
-FFLAGS = -O3 -fcheck=all -std=f2018 -fcoarray=single
+FFLAGS = -O -fcheck=all -std=f2018 -fcoarray=single
 
 #gfortran, with co-arrays. Make sure that the communication library is installed and linked correctly.
 #F90 = caf
@@ -14,7 +14,7 @@ FFLAGS = -O3 -fcheck=all -std=f2018 -fcoarray=single
 OBJ = precision_module.o dense_la_module.o matrix_module.o idrs_module.o
 
 SRC = ../../MODULES
-IDRS = $(SRC)/IDRS
+IDRS = $(SRC)/IDRS_ALGORITHMS
 
 all:	toeplitz
 

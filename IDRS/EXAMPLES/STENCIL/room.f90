@@ -12,13 +12,13 @@ program room
 !
 ! This software is distributed under the MIT License:
 ! http://www.opensource.org/licenses/mit-license.php
-! Copyright:(c) 2024 Martin van Gijzen
+! Copyright:(c) 2026 Martin van Gijzen
 !
 
    use interface_module          ! To read command line options
    use precision_module          ! Set real and complex precision
    use user_module               ! User functions, user defined matrix-vector product
-   use pp_idrs_module            ! Preconditioned IDRS solver calls
+   use idrs_driver_module        ! Preconditioned IDRS solver calls
 
    implicit none 
 
@@ -121,17 +121,17 @@ program room
    if ( multishift ) then
       cseed = sigma(Nsigma)
       if ( deflation ) then
-         x = pp_idrs( K, b, sigma, C=C, seed=cseed, V = V )
+         x = idrs_driver( K, b, sigma, C=C, seed=cseed, V = V )
       else
-         x = pp_idrs( K, b, sigma, C=C, seed=cseed )
+         x = idrs_driver( K, b, sigma, C=C, seed=cseed )
       end if
    else
       do isigma = 1, Nsigma
          cseed = sigma(isigma)
          if ( deflation ) then
-            x(:,isigma,:) = pp_idrs( K, b, C=C, seed=cseed, V = V )
+            x(:,isigma,:) = idrs_driver( K, b, C=C, seed=cseed, V = V )
          else
-            x(:,isigma,:) = pp_idrs( K, b, C=C, seed=cseed )
+            x(:,isigma,:) = idrs_driver( K, b, C=C, seed=cseed )
          end if
       end do
    end if

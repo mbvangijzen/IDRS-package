@@ -17,15 +17,15 @@ program sag
 !
 ! This software is distributed under the MIT License:
 ! http://www.opensource.org/licenses/mit-license.php
-! Copyright:(c) 2025 Martin van Gijzen
+! Copyright:(c) 2026 Martin van Gijzen
 !
 
-   use precision_module ! Set the precisions for real and complex arithmatic
-
-   use user_module      ! This one has to be supplied by the user
-   use interface_module ! To read command line parameters
-   use mm_module        ! To read the matrix-market matrices 
-   use pp_idrs_module   ! To solve the system
+   use precision_module      ! Set the precisions for real and complex arithmatic
+   use user_module           ! This one has to be supplied by the user
+   use interface_module      ! To read command line parameters
+   use mm_module             ! To read the matrix-market matrices 
+   use idrs_driver_module    ! To solve the system
+   use preconditioner_module
 
    implicit none 
 
@@ -41,12 +41,6 @@ program sag
    character(len=50)              :: matrix_file, rhs_file, map_file
    real(kind=rp), allocatable     :: x(:,:), b(:,:)
    integer                        :: nrhs, irhs, nrows, ncols
-
-! For preconditioner:
-   integer                        :: which_precon
-
-   logical                        :: lu
-   logical, parameter             :: default_lu = .false.
 
 ! Plotting:
    character(len=:), allocatable  :: plot
@@ -72,9 +66,6 @@ program sag
 
 ! Which test problem?
    grid = get_parameter('-grid', default_grid )
-
-! Direct solution?
-   lu = get_parameter( '-lu', default_lu )
 
 ! Output message, problem description:
    if ( my_proc == 1 ) then
@@ -102,15 +93,10 @@ program sag
 ! Copy the rhs-vector b from the user-defined type RHS
    b = RHS%rmat
 
-   which_precon = 1
-   if ( lu ) then
-! Shift-and-invert
-      which_precon = 2
-   end if
-   P = real_precon( which_precon, K )
+   P = jacobi( K )
 
 ! Solve the system:
-   x = pp_idrs( K, b, P=P )
+   x = idrs_driver( K, b, P=P )
 
 ! Make plot?
    include "ocean_plot.inc"

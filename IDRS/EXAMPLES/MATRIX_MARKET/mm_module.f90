@@ -119,7 +119,7 @@ module mm_module
          else
 !
 ! Change to crs-format, only for equation on this processor
-            call mm_crs( nrows, ncols, nnz, ival, indx, jndx, rval, cval, & 
+            call mm_crs( nrows, ncols, nnz, indx, jndx, rval, ival, cval, & 
                          my_proc, n_procs, symm, field, &
                          row_ptr, col_ind, l_rval, l_ival, l_cval )
 !
@@ -298,7 +298,7 @@ module mm_module
 
    end subroutine  mm_dense 
 
-   subroutine mm_crs( nrows, ncols, nnz, ival, indx, jndx, rval, cval, &
+   subroutine mm_crs( nrows, ncols, nnz, indx, jndx, rval, ival, cval, &
                       my_proc, n_procs, symm, field, &
                       row_ptr, col_ind, l_rval, l_ival, l_cval )
 !

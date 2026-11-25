@@ -124,9 +124,9 @@ function get_logical_parameter( parameter_name, default_value ) result(parameter
 end function get_logical_parameter
 
 function get_character_parameter( parameter_name, default_value ) result(parameter_value)
-   character(len = parameter_length) :: parameter_value
-   character(len = *)                :: parameter_name, default_value
-   integer                           :: k, kb, ke
+   character(len = 80)                       :: parameter_value
+   character(len = *)                        :: parameter_name, default_value
+   integer                                   :: k, kb, ke
 
 ! Set default_value:
    parameter_value = default_value

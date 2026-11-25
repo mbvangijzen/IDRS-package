@@ -1,7 +1,7 @@
 program toeplitz
 
    write(*,'(a,/,a,/,a,/,a,/,a,/,a,/,a,/,a,/,a,/)') &
-      'This programme illustrates IDR(s) using three different test problems:', &
+      'This programme illustrates IDR(s) using two different test problems:', &
       '   - a complex test problem with a system matrix that is Toeplitz,', &
       '   - a real 1D convection-diffusion problem, ', &
       'The three IDR(s) variants are tested:', & 
@@ -79,9 +79,10 @@ subroutine complex_toeplitz
 !  write(*,*)
 
    method = 'QMRIDR  '
+   variant = 1
    do i = 1,7
       s = 2**(i-1)
-      x = qmridr( A, b, s, M, tol, maxit, flag, relres, iter )
+      x = qmridr( A, b, s, M, tol, maxit, variant, flag, relres, iter )
       write(*,'(8x,a8, a,i3,a,i4,a,e10.3,a,i1)') method, &
          '  |  ', s,'    |   ', iter,'     |   ', relres,'   |    ',flag
    end do
@@ -157,9 +158,10 @@ subroutine real_toeplitz
       '  |  ', s,'    |   ', iter,'     |   ', relres,'   |    ',flag
 
    method = 'QMRIDR  '
+   variant = 1
    do i = 1, 4
       s = 2**(i-1)
-      x = qmridr( A, b, s, M, tol, maxit, flag, relres, iter, resvec=resvec )
+      x = qmridr( A, b, s, M, tol, maxit, variant, flag, relres, iter, resvec=resvec )
       write(*,'(8x,a8, a,i3,a,i4,a,e10.3,a,i1)') method, &
          '  |  ', s,'    |   ', iter,'     |   ', relres,'   |    ',flag
    end do
